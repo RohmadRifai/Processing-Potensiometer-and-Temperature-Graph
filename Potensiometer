@@ -1,0 +1,52 @@
+import processing.serial.*;
+Serial portSerial;
+int dataSekarang;
+int inByte;
+int[] nilaiY;
+int w;
+ 
+void setup()
+{
+  size (700,400);
+  w = width-10;
+  strokeWeight(3);
+  smooth();
+  nilaiY = new int[w];
+  //sesuikan dengan nomer COM kita
+  portSerial = new Serial(this, "COM5", 9600);  
+}
+ 
+void draw()
+{
+    String inString = portSerial.readStringUntil('\n');
+    if(inString != null){
+    inString = trim(inString);
+    inByte = int(inString);
+    println(inByte);    
+    dataSekarang = int(map(inByte, 0, 1023, 0+10, height-50));
+     
+    dataSekarang = height-dataSekarang;   
+    background(0);
+    
+    for(int i = 1; i < w; i++) {
+      nilaiY[i-1] = nilaiY[i];
+    }
+      
+    nilaiY[w-1] = dataSekarang;
+ 
+    textSize(32);    
+    text(inByte, 10, 30);
+         
+    stroke(255);
+    line(w, dataSekarang, width, dataSekarang);
+    strokeWeight(1);
+    line(0, dataSekarang, width, dataSekarang);
+    strokeWeight(3);
+  
+    for(int i=2; i<w; i++) {
+      strokeWeight(3);
+      stroke(220, 10, nilaiY[i]);     
+      line(i, nilaiY[i-1], i, nilaiY[i]);    
+    }
+  }
+}
