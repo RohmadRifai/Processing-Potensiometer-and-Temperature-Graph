@@ -1,170 +1,98 @@
 import processing.serial.*;
-PFont f;
-PFont F;
-Serial myPort;        // The serial port
-int xPos = 40;         // horizontal position of the graph
+Serial portSerial;
+int dataSekarang;
+int inByte;
+int[] nilaiY;
+int w;
+int fontSize = 20;
+int space = 20;
  
-void setup () {
-  // set the window size:  and Font size
-  f = createFont("Arial",12,true);
-  F = createFont("Arial",24,true);
-  size(700, 600);        
+void setup()
+{
+  size (700,400);
+  w = width-10;
+  strokeWeight(3);
+  smooth();
+  nilaiY = new int[w];
+  //sesuikan dengan nomer COM kita
+  portSerial = new Serial(this, "COM12", 9600);  
+}
  
-  // List all the available serial ports
-  println(Serial.list());
-  myPort = new Serial(this, Serial.list()[0], 9600);
-  myPort.bufferUntil('\n');
-  // set inital background:
-  background(70);
+void draw()
+{
+    //if(inString != null){
+    //inString = trim(inString);
+    //inByte = int(inString);
+    //println(inByte);    
+    dataSekarang = int(map(inByte, 0, 1023, 0+10, height-50));
+     
+    dataSekarang = height-dataSekarang;   
+    background(0);
+    
+    for(int i = 1; i < w; i++) {
+      nilaiY[i-1] = nilaiY[i];
+    }
+      
+    nilaiY[w-1] = dataSekarang;
+ 
+    textSize(fontSize);    
+    text(inByte/10, space+120, 30);
+    
+    textSize(fontSize);    
+    text("Degree Celcius", space+120, 50);
+    
+    textSize(fontSize);                 // 100 degree
+    text("100 -",space-10,66);
+    
+    textSize(fontSize);                // 90 degree
+    text("90 -",space,99);
+    
+    textSize(fontSize);;                // 80 degree
+    text("80 -",space,132);
+    
+    textSize(fontSize);                 // 70 degree
+    text("70 -",space,165);
+    
+    textSize(fontSize);               // space degree
+    text("60 -",space,198);
+    
+    textSize(fontSize);               // 50 degree
+    text("50 -",space,231);
+    
+    textSize(fontSize);                 // 40 degree
+    text("40 -",space,264);
+    
+    textSize(fontSize);
+    text("30 -",space,297);
+    
+    textSize(fontSize);
+    text("20 -",space,330);
+    
+    textSize(fontSize);
+    text("10 -",space,363);
+    
+    textSize(fontSize);
+    text("0 -",space+10,396);
+         
+    stroke(255);
+    line(w, dataSekarang, width, dataSekarang);
+    strokeWeight(1);
+    line(0, dataSekarang, width, dataSekarang);
+    strokeWeight(3);
+  
+    for(int i=2; i<w; i++) {
+      strokeWeight(3);
+      stroke(220, 10, nilaiY[i]);     
+      line(i, nilaiY[i-1], i, nilaiY[i]);    
+    }
+  //}
 }
 
-void draw ()
-{
-  // everything happens in the serialEvent()
-  String inString = myPort.readStringUntil('\n');
-  
-  if (inString != null) {
-    // trim off any whitespace:
-    
-    print("Temperature: ");
-    print(inString);
-    println("Degree Celcius");
+void serialEvent (Serial portSerial) {
+  String inString = portSerial.readStringUntil('\n');
+  if(inString!=null){
     inString = trim(inString);
-    
-    // convert to an int and map to the screen height:
-    float inByte = float(inString+(char)9); 
-    inByte = map(inByte, 0,117, 0, height);
-    
-    println(inByte);
-    
-    stroke(175);                       // temperature line
-    line(40,height-40,40,0);
-    
-    stroke(175);                          // Time line
-    line(40,height-40,width,height-40);
-    
-    stroke(100,100,255);                          // 30 degree line
-    line(40,height-196,width,height-196);
-     
-    stroke(100,100,255);                          // 60 degree line
-    line(40,height-350,width,height-350);
-    
-    stroke(100,100,255);                          // 90 degree line
-    line(40,height-504,width,height-504);
-     
-    textFont(F);       
-    fill(255);
-     
-    //textAlign(RIGHT);
-    //text("Temperature Plot Using Proccessing",680,40); 
-    
-    //textAlign(RIGHT);
-    //text("And Arduino By Saddam Khan",653,70); 
-    
-    //textAlign(RIGHT);
-    //text("Engineers Garage",580,100); 
-     
-    textAlign(RIGHT);
-    text("TEMP",70,30);                         
-    
-    textAlign(RIGHT);
-    text("TIME",650,585);    
-    
-    
-    
-    textAlign(RIGHT);
-    text(inString,500,200);
-     
-    textAlign(RIGHT);
-    text(" Degree Celsuis",560,230);
-    
-    
-    fill(0);
-    // int j;
-    stroke(255);   
-    for(int j=500;j>430;j--)
-    {
-      line(j,height-398,j,height-425);
-    }
-    stroke(0,0,0);
-    textAlign(RIGHT);
-    text(inString,495,200); 
-     
-    
-    fill(240);
-    textFont(f); 
-     
-    textAlign(RIGHT);
-    text("(In Degree)",140,30); 
-    
-    textAlign(RIGHT);                 // 100 degree
-    text("100 -",40,49);
-    
-    textAlign(RIGHT);                // 90 degree
-    text("90 -",40,100);
-    
-    textAlign(RIGHT);                // 80 degree
-    text("80 -",40,151);
-    
-    textAlign(RIGHT);                 // 70 degree
-    text("70 -",40,203);
-    
-    textAlign(RIGHT);                // 60 degree
-    text("60 -",40,254);
-    
-    textAlign(RIGHT);               // 50 degree
-    text("50 -",40,305);
-    
-    textAlign(RIGHT);                 // 40 degree
-    text("40 -",40,356);
-    
-    textAlign(RIGHT);
-    text("30 -",40,408);
-    
-    textAlign(RIGHT);
-    text("20 -",40,459);
-    
-    textAlign(RIGHT);
-    text("10 -",40,510);
-    
-    textAlign(RIGHT);
-    text("0 -",40,562);
-     
-    /*---- scale between 30 degree to 40 degree------*/
-    
-    //textAlign(RIGHT);
-    //text("   -",40,370);
-    
-    //textAlign(RIGHT);
-    //text("   -",40,380);
-    
-    //textAlign(RIGHT);
-    //text("   -",40,390);
-    
-    //textAlign(RIGHT);
-    //text("   -",40,400);
-    
-    // textAlign(RIGHT);
-    // text("0 -",40,360);
-     
-    // draw the line:
-    int shift=40;            // set trace origin
-    stroke(255,0,0);              // trace colour
-    for(int i=0;i<2;i++)
-    {
-      // line(xPos, height-inByte-1, xPos, height - inByte);
-      line(xPos, height-inByte-(shift+2), xPos, height-inByte-shift);
-      xPos++;
-    }
-    if (xPos >= width)         //  go back to begining
-    {
-      xPos = 40;
-      background(100); 
-    }
+    inByte = int(inString);
+    inByte *= 10;
   }
-}
- 
-void serialEvent (Serial myPort) {
-  // get the ASCII string:
-  
 }
